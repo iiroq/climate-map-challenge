@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import Metolib from '@fmidev/metolib';
 import './App.css';
-import {Map, Marker, TileLayer} from "react-leaflet";
+import {Map, Marker, TileLayer, Popup} from "react-leaflet";
 import styled from "styled-components";
 import L from "leaflet";
 import Sidebar from './Sidebar';
@@ -35,14 +35,15 @@ function App() {
       connection.getData({
         begin: Date.now() - 60e3 * 60 * 24 * 6,
         end: Date.now(),
-        requestParameter: "t,snowdepth,r_1h",
+        requestParameter: "t,snowdepth,r_1h,ws_10min,wawa",
         timestep: 60 * 60 * 1000,
         bbox: "20.6455928891, 59.846373196, 31.5160921567, 70.1641930203",
         callback: (data, errors) => {
+          console.log(data)
           if (errors.length > 0) {
 
             errors.forEach(err => {
-              console.error('FMI API error: ' + err.errorText);
+              //console.error('FMI API error: ' + err.errorText);
             });
             return;
           }
@@ -69,9 +70,15 @@ function App() {
         subdomains='abcd'
         maxZoom={19}
       />
-      {observationLocations.map(loc => <Marker position={[loc.position.lat, loc.position.lon]}
+      {observationLocations.map(loc => <Marker position={[loc.position.lon, loc.position.lat]}
                                                key={loc.info.id} onClick={() => setSelectedLocation(loc.info.id)}>
-      </Marker>)}
+      <Popup>
+        {loc && JSON.stringify(loc.info.name)}
+      </Popup>
+      </Marker>
+        )}
+    )
+
     </MapContainer>
   );
 
